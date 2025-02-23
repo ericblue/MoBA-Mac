@@ -37,9 +37,46 @@ Our code is available at [MoonshotAI/MoBA](https://github.com/MoonshotAI/MoBA).
 </p>
 
 
+## Current Status
+
+MoBA successfully compiles on macOS and loads models; however, it is currently generating gibberish output. This issue is likely due to the custom attention wrapper and some of the tensor and token parameters. Resolving these issues is a work in progress.
+
+## Differences Between `llama.py` and `llama-mac-experimental.py`
+
+The `llama-mac-experimental.py` version includes several modifications to ensure compatibility with Mac and CPU environments:
+
+- **Removed CUDA and Flash Attention**: Dependencies on CUDA and `flash-attn` have been eliminated.
+- **Updated PyTorch Precision for Mac (MPS)**: Ensures the model runs in `float32` instead of `float16` to avoid precision issues on MPS.
+- **Fixed Tokenization Issues**: Enforces `return_tensors="pt"` and `return_attention_mask=True` to properly handle attention masks.
+- **Adjusted Input Shapes**: Ensures `input_ids` and `attention_mask` have the correct batch dimensions using `.unsqueeze(0)` where needed.
+- **Improved Sampling Parameters**: Tweaks `temperature`, `top_k`, and `top_p` values to generate more coherent text and prevent gibberish output.
+- **Updated Execution Instructions**: Uses `moba_naive` as the default attention backend.
+
+MoBA successfully compiles on macOS and loads models; however, it is currently generating gibberish output. This issue is likely due to the custom attention wrapper and some of the tensor and token parameters. Resolving these issues is a work in progress.
+
+## Environment Setup (No CUDA, CPU/MPS Support)
+
+**Note**: This version of MoBA has been modified to run on **CPU and MPS (Mac)** without requiring CUDA or Flash Attention.
+
+```
+# Create and activate MoBA environment
+conda create -n moba python=3.10
+conda activate moba
+
+# Install dependencies without Flash Attention
+pip uninstall flash-attn -y
+pip install --no-cache-dir -r requirements.txt
+
+# Ensure PyTorch is installed for CPU/MPS
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Install MoBA
+pip install -e .
+```
 
 
-## Environment Setup
+
+## Environment Setup (Original Version)
 **Note that current kernel implementations rely on `flash-attn==2.6.3` and `torch >= 2.1.0`**
 
 ```bash
